@@ -9,11 +9,41 @@ wiring it up to a Medusa.js backend for real product/order management.
 
 ```bash
 npm install
+cp .env.local.example .env.local
+```
+
+Then edit `.env.local` and fill in:
+```
+NEXT_PUBLIC_MEDUSA_BACKEND_URL=https://your-backend.up.railway.app
+NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_...
+```
+(Get the URL from Railway's Networking settings for your Medusa service, and
+the key from Medusa Admin → Settings → Publishable API Keys.)
+
+```bash
 npm run dev
 ```
 
 Open http://localhost:3000. First run will download the Fraunces and Inter
 fonts from Google Fonts, so make sure you have a normal internet connection.
+
+## Pages now live
+
+- `/` — homepage, "New Arrivals" section now pulls real products from Medusa
+- `/products` — full shop grid, live data
+- `/product/[handle]` — product detail page with variant selection + add to cart
+- `/cart` — cart with quantity update/remove, subtotal
+- `/about` — heritage story, craft process, gallery
+- `/contact` — contact form (UI only — not yet wired to send anywhere)
+
+## Not yet built
+
+- `/checkout` — needs a payment provider (Stripe or Razorpay) configured in
+  Medusa first; this is the natural next step
+- Category-specific pages (currently all categories fall back to the case-insensitive
+  `/products` grid — filtering by category can be added once you confirm how
+  you want categories organized in Medusa)
+- Contact form submission handling (currently just a styled form with no backend)
 
 ## Project structure
 
