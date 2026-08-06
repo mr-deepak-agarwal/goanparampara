@@ -27,6 +27,13 @@ export async function getRegionId(): Promise<string> {
   return region.id;
 }
 
+export type MedusaCategory = {
+  id: string;
+  handle: string;
+  name: string;
+  description?: string | null;
+};
+
 // Note: ISR/caching is controlled by `export const revalidate = 60` on each
 // page, not per-call here — the SDK's second argument is request headers,
 // not Next.js fetch options.
@@ -40,6 +47,32 @@ export async function getProductByHandle(handle: string): Promise<MedusaProduct 
   const region_id = await getRegionId();
   const { products } = await sdk.store.product.list({ handle, region_id });
   return (products[0] as MedusaProduct) || null;
+}
+
+export async function getCategoryByHandle(handle: string): Promise<MedusaCategory | null> {
+  const { product_categories } = await sdk.store.category.list({ handle: [handle] });
+  return (product_categories[0] as MedusaCategory) || null;
+}
+
+export async function getProductsByCategory(
+  categoryHandle: string,
+  limit = 48
+): Promise<{ category: MedusaCategory | null; products: MedusaProduct[] }> {
+  const category = await getCategoryByHandle(categoryHandle);
+  if (!category) return { category: null, products: [] };
+
+  const region_id = await getRegionId();
+  const { products } = await sdk.store.product.list({
+    category_id: [category.id],
+    limit,
+    region_id,
+  });
+  return { category, products: products as MedusaProduct[] };
+}
+
+export async function getAllCategories(): Promise<MedusaCategory[]> {
+  const { product_categories } = await sdk.store.category.list({ limit: 50 });
+  return product_categories as MedusaCategory[];
 }
 
 export function formatPrice(amountMinor: number, currency = "INR") {
